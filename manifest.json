@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-timestamp",
+	"name": "Obsidian Timestamp",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
+	"author": "1etterh",
+	"authorUrl": "https://github.com/1etterh",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }

@@ -1,0 +1,33 @@
+/* 리본 아이콘 깜빡임 */
+.side-dock-ribbon-action.is-recording {
+	color: red !important;
+}
+
+.is-recording svg {
+	fill: red !important;
+	animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+	to {
+		visibility: hidden;
+	}
+}
+
+/* 읽기 모드 재생 버튼 */
+.audio-play-button {
+	cursor: pointer;
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.75em;
+	margin-left: 5px;
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+}
+
+.audio-play-button:hover {
+	opacity: 0.8;
+}
