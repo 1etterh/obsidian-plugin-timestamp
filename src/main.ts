@@ -1,4 +1,4 @@
-import { Plugin, MarkdownView, Notice } from 'obsidian';
+import { Plugin, MarkdownView, Notice, TFile } from 'obsidian';
 import { AudioRecordingManager } from './RecordingManager';
 import { EditorHandler } from './EditorHandler';
 
@@ -10,6 +10,14 @@ export default class AudioSyncPlugin extends Plugin {
 		this.recorder = new AudioRecordingManager(this.app);
 		this.editorHandler = new EditorHandler(this.app, this.recorder);
 		this.editorHandler.setup();
+
+		this.registerEvent(
+			this.app.workspace.on('active-leaf-change', () => {
+				if (!this.recorder.isRecording) {
+					this.recorder.resetCumulativeTime();
+				}
+			})
+		);
 
 		const ribbonIconEl = this.addRibbonIcon('microphone', 'Audio Sync Recorder', async () => {
 			if (!this.recorder.isRecording) {
@@ -49,25 +57,33 @@ export default class AudioSyncPlugin extends Plugin {
 		});
 	}
 
-	insertAudioLink(file: any) {
+	insertAudioLink(file: TFile) {
 		const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (activeView) {
 			const editor = activeView.editor;
-			const link = `![[${file.path}]]\n\n`;
+			const content = editor.getValue();
+
+			// 이미 해당 파일 링크가 본문에 있다면 또 넣지 않음
+			if (content.includes(`[[${file.name}]]`)) return;
+
+			const link = `![[${file.name}]]\n`;
 			editor.replaceRange(link, { line: 0, ch: 0 });
 		}
 	}
 
 	playAudioAt(seconds: number) {
-		// 현재 활성화된 문서의 오디오 엘리먼트 찾기
-		const audioEl = document.querySelector('.markdown-reading-view audio, .markdown-source-view audio') as HTMLAudioElement;
+		// 해당 페이지의 모든 오디오 엘리먼트를 가져옴
+		const audioEls = document.querySelectorAll('audio');
 
-		if (audioEl) {
-			audioEl.currentTime = seconds;
-			audioEl.play();
-			new Notice(`재생 시점: ${seconds}초`);
-		} else {
-			new Notice("상단에 오디오 파일이 없습니다.");
+		// "이어서 녹음"한 경우 파일이 여러 개일 수 있으므로,
+		// 전체 시간을 계산해 맞는 파일을 찾아야 하지만,
+		// 우선은 가장 마지막 오디오(최신)를 기준으로 재생하거나
+		// 모든 오디오를 탐색하는 로직이 필요합니다.
+		// 여기서는 단순하게 첫 번째 오디오를 제어합니다.
+		if (audioEls.length > 0) {
+			const lastAudio = audioEls[audioEls.length - 1];
+			lastAudio!.currentTime = seconds;
+			lastAudio!.play();
 		}
 	}
 }
